@@ -38,13 +38,8 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         }
         multi = Math.max(multi, group.length);
     }
-    
-    if(opts.total>0) total = opts.total;
 
-    console.log("Groups: " + len);
-    console.log("Total: " + total);
-    console.log("Maximum group length: " + multi);
-    console.log("Maximum stack length: " + stacklen);
+    if(opts.total>0) total = opts.total;
 
     // Fill the gaps
     for (var i = values.length; i--;) {
@@ -64,8 +59,6 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
             }
         }
     }
-    console.log("x: " + x);
-    console.log("y: " + y);
     // Calculate the gutters (percentage of the bar and group width accordingly)
     var axiswidth = 30, // TODO: fixed y-axis width
         innerwidth = width - axiswidth,
@@ -78,7 +71,7 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         X = x + axiswidth,
         Y = (height - 2 * barvgutter) / total,
         bottomy = y + height - barvgutter + barhgutter;
-        
+
     var sum = 0,
         axis = this.set(),
         miny = 0, 
@@ -93,7 +86,7 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         for (var j = 0; j < group.length; j++, sum = 0) {
             var stackd = group[j],
                 stackSum = 0;
-            
+
             for (var k = 0; k < stackd.length; k++) {
                 var h = Math.round(stackd[k] * Y),
                     top = y + height - barvgutter - h,
@@ -147,7 +140,6 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
             axis.push(this.g.finger(startX, bottomy + boxwidth*2 , endX = X-startX, 1, false, type).attr({stroke: "none", fill: '#BBB'}));
             axis.push(this.g.flag(startX, bottomy + boxwidth*2, grouplabels[i] || "", -60));
         }
-        
         X += grouphgutter;
     }
 
@@ -188,7 +180,6 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         covers2.click(f);
         return this;
     };
-    
     chart.push(bars, covers, covers2, axis);
     chart.bars = bars;
     chart.covers = covers;
