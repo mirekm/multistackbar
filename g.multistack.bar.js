@@ -69,9 +69,9 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
     // Calculate the gutters (percentage of the bar and group width accordingly)
     var axiswidth = 30, // TODO: fixed y-axis width
         innerwidth = width - axiswidth,
-        groupwidth = Math.floor(innerwidth / (len + (len-1)*(gutter/100))),
+        groupwidth = Math.round(innerwidth / (len + (len-1)*(gutter/100))),
         grouphgutter = Math.round(groupwidth * gutter / 100),
-        barwidth = Math.floor(groupwidth / (multi + (multi-1)*(gutter/100))),
+        barwidth = Math.round(groupwidth / (multi + (multi-1)*(gutter/100))),
         barhgutter = Math.round(barwidth * gutter / 100),
         barvgutter = opts.vgutter == null ? 20 : opts.vgutter,
         stack = [],
@@ -79,9 +79,6 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         Y = (height - 2 * barvgutter) / total,
         bottomy = y + height - barvgutter + barhgutter;
         
-    console.log("grouphgutter: " + grouphgutter);
-    console.log("groupwidth: " + groupwidth);
-
     var sum = 0,
         axis = this.set(),
         miny = 0, 
@@ -147,10 +144,10 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         }
         if (grouplabels) {
             var endX;
-            axis.push(this.g.finger(startX, bottomy + boxwidth*2 , endX = X-startX-barhgutter, 1, false, type).attr({stroke: "none", fill: '#BBB'}));
+            axis.push(this.g.finger(startX, bottomy + boxwidth*2 , endX = X-startX, 1, false, type).attr({stroke: "none", fill: '#BBB'}));
             axis.push(this.g.flag(startX, bottomy + boxwidth*2, grouplabels[i] || "", -60));
         }
-        console.log("grouphgutter: " + grouphgutter);
+        
         X += grouphgutter;
     }
 
