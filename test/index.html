@@ -13,16 +13,16 @@
             window.onload = function () {
                 var r = Raphael("holder"),
                     fin = function () {
-                        this.flag = r.g.popup(this.bar.x, this.bar.y - this.bar.h, this.bar.value || "0").insertBefore(this);
+                        this.flag = r.g.flag(this.bar.x - this.bar.w/2, this.bar.y - this.bar.h, (this.bar.value || "0") + " " + this.bar.label).insertBefore(this);
                     },
                     fout = function () {
-                        this.flag.animate({opacity: 0}, 200, function () {this.remove();});
+                        this.flag.animate({opacity: 0}, 300, function () {this.remove();});
                     },
                     fin2 = function () {
-                        this.flag = r.g.flag(this.bar.x+3, this.bar.y, this.bar.value + " PLN", 60).insertBefore(this);
+                        this.flag = r.g.popup(this.bar.x, this.bar.y - 2, this.bar.value + " PLN").insertBefore(this);
                     },
                     fout2 = function () {
-                        this.flag.animate({opacity: 0}, 50, function () {this.remove();});
+                        this.flag.animate({opacity: 0}, 300, function () {this.remove();});
                     };
                 r.g.txtattr.font = "10px 'Helvetica Neue', 'Droid Sans', Arial, 'Liberation Sans', FreeSans, sans-serif";
                 var data1 = [
@@ -90,10 +90,72 @@
                 var chart = r.g.multistackbar(20, 20, 600, 200, data1, { 
                             axis: true, smooth: true, 
                             grouplabels: ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"],
-                            stacklabelcolors: ['#FF0000', '#00FF00', '#0000FF']
+                            stackitemlabels: ['PLN', 'EUR', 'GBP'],
+                            stacklabelcolors: ['#FF0000', '#00FF00', '#0000FF'],
                             });
                 chart.hover(fin, fout);
                 chart.hoverColumn(fin2, fout2);
+                
+                
+                var data2 = [
+                                [
+                                    [2, 8, 14], 
+                                    [12, 20, 30]
+                                ],
+                                [
+                                    [20, 30, 25], 
+                                    [0, 0, 3]
+                                ], 
+                                [
+                                    [2, 8, 19], 
+                                    [12, 20, 30]
+                                ],
+                                [
+                                    [1, 15, 2], 
+                                    [12, 20, 30]
+                                ],
+                                [
+                                    [20, 30, 25], 
+                                    [0, 0, 3]
+                                ], 
+                                [
+                                    [2, 8, ], 
+                                    [1, 5]
+                                ],
+                                [
+                                    [1, 15, 2], 
+                                    [12, 20, 30]
+                                ],
+                                [
+                                    [20, 30, 25], 
+                                    [13, 32]
+                                ], 
+                                [
+                                    [2, 8, 0], 
+                                    [12, 20, 30]
+                                ],
+                                [
+                                    [2, 8, 14], 
+                                    [12, 20, 30]
+                                ],
+                                [
+                                    [13, 32],
+                                    [0, 0, 3]
+                                ], 
+                                [
+                                    [10, 15], 
+                                    [1, 5]
+                                ]
+                            ];
+                var chart2 = r.g.multistackbar(20, 260, 600, 260, data2, { 
+                            axis: true, smooth: true, 
+                            grouplabels: ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"],
+                            stackitemlabels: ['PLN', 'EUR', 'GBP'],
+                            stacklabelcolors: ['#FF0000', '#00FF00', '#0000FF'],
+                            total: 90
+                            });
+                chart2.hover(fin, fout);
+                chart2.hoverColumn(fin2, fout2);
             };
         </script> 
     </head> 

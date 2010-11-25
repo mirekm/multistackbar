@@ -12,6 +12,7 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         bars = this.set(),
         covers = this.set(),
         covers2 = this.set(),
+        covers3 = this.set(),
         total = 0,
         paper = this,
         multi = values[0].length, // Total number of stacks in one group
@@ -19,6 +20,7 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         len = values.length,
         colors = opts.colors || this.g.colors,
         grouplabels = opts.grouplabels,
+        stacklabelcolors = opts.stacklabelcolors,
         len = values.length;
 
     // Who's the most
@@ -36,6 +38,8 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         }
         multi = Math.max(multi, group.length);
     }
+    
+    if(opts.total>0) total = opts.total;
 
     console.log("Groups: " + len);
     console.log("Total: " + total);
@@ -60,45 +64,54 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
             }
         }
     }
-
+    console.log("x: " + x);
+    console.log("y: " + y);
     // Calculate the gutters (percentage of the bar and group width accordingly)
     var axiswidth = 30, // TODO: fixed y-axis width
-        innerwidth = width - 30,
-        groupwidth = innerwidth / (len + (len+1)*(gutter/100)),
-        grouphgutter = groupwidth * gutter / 100,
-        barwidth = groupwidth / (multi + (multi-1)*(gutter/100)),
-        barhgutter = barwidth * gutter / 100,
+        innerwidth = width - axiswidth,
+        groupwidth = Math.floor(innerwidth / (len + (len-1)*(gutter/100))),
+        grouphgutter = Math.round(groupwidth * gutter / 100),
+        barwidth = Math.floor(groupwidth / (multi + (multi-1)*(gutter/100))),
+        barhgutter = Math.round(barwidth * gutter / 100),
         barvgutter = opts.vgutter == null ? 20 : opts.vgutter,
         stack = [],
         X = x + axiswidth,
-        Y = (height - 2 * barvgutter) / total;
+        Y = (height - 2 * barvgutter) / total,
+        bottomy = y + height - barvgutter + barhgutter;
+        
+    console.log("grouphgutter: " + grouphgutter);
+    console.log("groupwidth: " + groupwidth);
 
     var sum = 0,
         axis = this.set(),
         miny = 0, 
         maxy = total;
 
-    // Add y-axis first
+    // y-axis
     +opts.axis && axis.push(this.g.axis(x + 15, y + height - gutter, height - 2 * gutter, miny, maxy, opts.axisystep || Math.floor((height - 2 * gutter) / 20), 1));
 
     for (var i = 0; i < values.length; i++) {
         var group = values[i];
         var startX = X;
         for (var j = 0; j < group.length; j++, sum = 0) {
-            var stackd = group[j];
-            var stackSum = 0;
+            var stackd = group[j],
+                stackSum = 0;
+            
             for (var k = 0; k < stackd.length; k++) {
                 var h = Math.round(stackd[k] * Y),
                     top = y + height - barvgutter - h,
-                    bar = this.g.finger(Math.round(X + barwidth / 2),
-                                        sum + top + h, 
-                                        barwidth, h, true, type).attr({stroke: "none", fill: colors[k]});
+                    barx = Math.round(X + barwidth / 2),
+                    bary = sum + top + h,
+                    bar = this.g.finger(barx, bary, 
+                                        barwidth, h, 
+                                        true, type).attr({stroke: "none", fill: colors[k]});
                 bars[j].push(bar);
-                bar.y = sum + top + h;
-                bar.x = Math.round(X + barwidth / 2);
+                bar.y = bary;
+                bar.x = barx;
                 bar.w = barwidth;
                 bar.h = h;
                 bar.value = stackd[k];
+                bar.label = opts.stackitemlabels[k] || "";
                 stack.push(bar);
                 // Rollover
                 var cover;
@@ -115,24 +128,43 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
             // 'Total' rollover
             var cvr;
             covers2.push(cvr = this.rect(bar.x - bar.w / 2, y, barwidth, height).attr(this.g.shim));
-            cvr.bar = {x: bar.x - bar.w / 2, y: bar.y - bar.h, w: barwidth, h: height, value: stackSum};
+            cvr.bar = {x: bar.x, y: bar.y - bar.h, w: barwidth, h: height, value: stackSum};
+            // Optional stack color label
+            var boxheight = barwidth - barwidth*0.5,
+                boxwidth = Math.min(barwidth * 3/4, 8),
+                boxmargin = (barwidth - boxwidth)/2,
+                box, boxx, boxy;
+            if (stacklabelcolors) {
+                //axis.push(box = this.rect(boxx = bar.x - bar.w / 2 + boxmargin, boxy = y + height - barwidth, boxwidth, boxheight).attr({stroke: "none", fill: stacklabelcolors[j] || '#BBB'}));
+                axis.push(box = this.g.drop(boxx = bar.x, boxy = bottomy, "", boxwidth, -90).attr({stroke: "none", fill: stacklabelcolors[j] || '#BBB'}));
+                box.tip = {x: boxx, y: boxy};
+                covers3.push(box);
+            }
+            if (j < (group.length - 1)) {
+                X += barhgutter;
+            }
             X += barwidth;
-            X += barhgutter;
         }
-
         if (grouplabels) {
             var endX;
-            axis.push(this.g.finger(startX, height + gutter, endX = X-startX-barhgutter, 1, false, type).attr({stroke: "none", fill: '#BBB'}));
-            axis.push(this.g.flag(startX, height + gutter, grouplabels[i] || "", -60).attr({font: "8px"}));
-            
+            axis.push(this.g.finger(startX, bottomy + boxwidth*2 , endX = X-startX-barhgutter, 1, false, type).attr({stroke: "none", fill: '#BBB'}));
+            axis.push(this.g.flag(startX, bottomy + boxwidth*2, grouplabels[i] || "", -60));
         }
-
+        console.log("grouphgutter: " + grouphgutter);
         X += grouphgutter;
     }
 
+    covers3.toFront();
+    axis.toFront();
     covers2.toFront();
     covers.toFront();
-    axis.toFront();
+
+    covers3.mouseover(function() {
+        this.flag = paper.g.popup(this.tip.x, this.tip.y, "Test").insertBefore(this);
+        //this.animate({scale: 2}, 300);
+    }).mouseout(function() {
+        //this.flag.animate({opacity: 0}, 300, function () {this.remove();});
+    });
 
     chart.hover = function (fin, fout) {
         //covers2.hide();
