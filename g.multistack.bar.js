@@ -20,6 +20,8 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         len = values.length,
         colors = opts.colors || this.g.colors,
         grouplabels = opts.grouplabels,
+        itemlabels = opts.itemlabels || [],
+        stackitemlabels = opts.stackitemlabels || [],
         stacklabelcolors = opts.stacklabelcolors,
         len = values.length;
 
@@ -62,15 +64,16 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
     // Calculate the gutters (percentage of the bar and group width accordingly)
     var axiswidth = 30, // TODO: fixed y-axis width
         innerwidth = width - axiswidth,
+        innerheight = height - 50,
         groupwidth = Math.round(innerwidth / (len + (len-1)*(gutter/100))),
         grouphgutter = Math.round(groupwidth * gutter / 100),
         barwidth = Math.round(groupwidth / (multi + (multi-1)*(gutter/100))),
         barhgutter = Math.round(barwidth * gutter / 100),
-        barvgutter = opts.vgutter == null ? 20 : opts.vgutter,
+        barvgutter = opts.vgutter == null ? 25 : opts.vgutter,
         stack = [],
         X = x + axiswidth,
-        Y = (height - 2 * barvgutter) / total,
-        bottomy = y + height - barvgutter + barhgutter;
+        Y = (total != 0 ? (innerheight - 2 * barvgutter) / total: 0),
+        bottomy = y + innerheight - barvgutter + barhgutter;
 
     var sum = 0,
         axis = this.set(),
@@ -78,7 +81,7 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
         maxy = total;
 
     // y-axis
-    +opts.axis && axis.push(this.g.axis(x + 15, y + height - gutter, height - 2 * gutter, miny, maxy, opts.axisystep || Math.floor((height - 2 * gutter) / 20), 1));
+    +opts.axis && axis.push(this.g.axis(x + 15, y + innerheight - barvgutter, innerheight - 2 * barvgutter, miny, maxy, opts.axisystep || Math.floor((innerheight) / 30), 1));
 
     for (var i = 0; i < values.length; i++) {
         var group = values[i];
@@ -89,7 +92,7 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
 
             for (var k = 0; k < stackd.length; k++) {
                 var h = Math.round(stackd[k] * Y),
-                    top = y + height - barvgutter - h,
+                    top = y + innerheight - barvgutter - h,
                     barx = Math.round(X + barwidth / 2),
                     bary = sum + top + h,
                     bar = this.g.finger(barx, bary, 
@@ -101,7 +104,7 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
                 bar.w = barwidth;
                 bar.h = h;
                 bar.value = stackd[k];
-                bar.label = opts.stackitemlabels[k] || "";
+                bar.label = itemlabels[i] && itemlabels[i][j] && itemlabels[i][j][k] || stackitemlabels[k] || "";
                 stack.push(bar);
                 // Rollover
                 var cover;
@@ -117,8 +120,8 @@ Raphael.fn.g.multistackbar = function (x, y, width, height, values, opts) {
             }
             // 'Total' rollover
             var cvr;
-            covers2.push(cvr = this.rect(bar.x - bar.w / 2, y, barwidth, height).attr(this.g.shim));
-            cvr.bar = {x: bar.x, y: bar.y - bar.h, w: barwidth, h: height, value: stackSum};
+            covers2.push(cvr = this.rect(bar.x - bar.w / 2, y, barwidth, innerheight).attr(this.g.shim));
+            cvr.bar = {x: bar.x, y: bar.y - bar.h, w: barwidth, h: innerheight, value: stackSum};
             // Optional stack color label
             var boxheight = barwidth - barwidth*0.5,
                 boxwidth = Math.min(barwidth * 3/4, 8),

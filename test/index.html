@@ -1,11 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
 <html lang="en">
     <head> 
-        <title>g·Raphaël Multi StackBar Chart</title> 
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
-        <meta name="author" content="Mirek Mencel"> 
-        <meta name="description" content="Multi StackBar Chart"> 
-        <link rel="stylesheet" href="style.css" type="text/css" media="screen" charset="utf-8"> 
+        <title>g·Raphaël Multi StackBar Chart</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="author" content="Mirek Mencel" />
+        <meta name="description" content="Multi StackBar Chart" />
+        <link rel="stylesheet" href="style.css" type="text/css" media="screen" charset="utf-8" />
         <script src="http://raphaeljs.com/raphael.js" type="text/javascript" charset="utf-8"></script> 
         <script src="http://g.raphaeljs.com/g.raphael.js" type="text/javascript" charset="utf-8"></script>
         <script src="../g.multistack.bar.js" type="text/javascript" charset="utf-8"></script>
@@ -92,6 +92,11 @@
                             grouplabels: ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"],
                             stackitemlabels: ['PLN', 'EUR', 'GBP'],
                             stacklabelcolors: ['#FF0000', '#00FF00', '#0000FF'],
+                            colors: ["#63b700", "#2685fb", "#ff9600" ],
+                            valueformatter: function(value, label) {
+                                // Default implementation if nothing else passed as chart option
+                                return value + " " + label;
+                            }
                             });
                 chart.hover(fin, fout);
                 chart.hoverColumn(fin2, fout2);
@@ -143,7 +148,7 @@
                                     [0, 0, 3]
                                 ], 
                                 [
-                                    [10, 15], 
+                                    [10, 15.13], 
                                     [1, 5]
                                 ]
                             ];
